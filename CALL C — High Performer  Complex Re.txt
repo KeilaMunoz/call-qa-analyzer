@@ -1,0 +1,16 @@
+CALL C — High Performer / Complex Resolution
+(Healthcare Insurance — Claims Dispute)
+
+Agent: Thank you for calling ClearPath Benefits, this is Devon. Can I get your member ID number?
+Customer: Yes, it's HCP-774291. I'm calling because I got a bill for $340 from my doctor and I thought that visit was covered.
+Agent: I'm sorry to hear that, I can understand how frustrating it is to receive an unexpected bill. Let me pull up your claims history. One moment please. I can see the claim here. It looks like the visit was processed under your out-of-network benefits because the provider wasn't in our network at the time of service.
+Customer: Nobody told me that. My doctor has been in-network for three years.
+Agent: You're right to be concerned about that. Let me check the provider directory history. I can see there was a network change effective January 1st. I want to make sure we handle this correctly for you. I'm going to submit a network exception review on your behalf, which means if it's approved, the claim would be reprocessed at the in-network rate and your out-of-pocket would drop to approximately $45.
+Customer: How long does that take?
+Agent: The review takes 5 to 7 business days. I'm going to give you a case number right now, and you'll receive a written decision by mail and email. Case number is EXC-2026-8847.
+Customer: Okay. And I shouldn't pay the $340 in the meantime?
+Agent: Correct. I'd recommend holding off until the review is complete. I'm noting that on your account as well so there's no collections action during the review period.
+Customer: That's really helpful. Thank you Devon.
+Agent: Of course. Is there anything else I can help you with today?
+Customer: No, that's everything.
+Agent: Thank you for being a ClearPath member. I hope we get this resolved in your favor. Have a great day.

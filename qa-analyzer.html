@@ -1,0 +1,956 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Call QA Analyzer</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap">
+
+<style>
+/* ─── LAYOUT: two-panel on desktop, stacked on mobile ─── */
+:root {
+  --bg: #F7F6F3;
+  --surface: #FFFFFF;
+  --border: #E2DDD6;
+  --fg: #1A1916;
+  --fg-muted: #6B6560;
+  --fg-faint: #A89F97;
+  --accent: #C4533A;
+  --accent-light: #FAF0ED;
+  --accent-mid: #E8A090;
+  --pass: #2A7D4F;
+  --pass-light: #EDF7F2;
+  --warn: #B07D20;
+  --warn-light: #FDF6E3;
+  --fail: #C4533A;
+  --fail-light: #FAF0ED;
+
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'DM Mono', 'Courier New', monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #18171A;
+    --surface: #222028;
+    --border: #35323C;
+    --fg: #F0EDE8;
+    --fg-muted: #9C97A0;
+    --fg-faint: #5C5860;
+    --accent: #E0705A;
+    --accent-light: #2A1F1D;
+    --accent-mid: #7A3528;
+    --pass: #4AB87A;
+    --pass-light: #172A20;
+    --warn: #D4A040;
+    --warn-light: #2A2010;
+    --fail: #E0705A;
+    --fail-light: #2A1F1D;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #18171A;
+  --surface: #222028;
+  --border: #35323C;
+  --fg: #F0EDE8;
+  --fg-muted: #9C97A0;
+  --fg-faint: #5C5860;
+  --accent: #E0705A;
+  --accent-light: #2A1F1D;
+  --accent-mid: #7A3528;
+  --pass: #4AB87A;
+  --pass-light: #172A20;
+  --warn: #D4A040;
+  --warn-light: #2A2010;
+  --fail: #E0705A;
+  --fail-light: #2A1F1D;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding-inline: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100%;
+}
+
+/* ─── HEADER ─── */
+.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 18px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 100;
+}
+
+.header-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.brand-name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--fg);
+  letter-spacing: -0.3px;
+}
+
+.brand-tag {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  padding: 3px 8px;
+  border: 1.5px solid var(--accent);
+  border-radius: 4px;
+}
+
+.header-meta {
+  font-size: 12px;
+  color: var(--fg-muted);
+  font-family: var(--font-mono);
+}
+
+/* ─── MAIN LAYOUT ─── */
+.app-shell {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: calc(100vh - 65px);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+@media (max-width: 800px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── INPUT PANEL ─── */
+.panel-input {
+  padding: 28px 24px 28px 28px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (max-width: 800px) {
+  .panel-input {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding: 20px 16px;
+  }
+}
+
+.section-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-bottom: 8px;
+}
+
+.panel-title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  line-height: 1.2;
+  color: var(--fg);
+  text-wrap: balance;
+  letter-spacing: -0.5px;
+}
+
+.panel-subtitle {
+  font-size: 13px;
+  color: var(--fg-muted);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+.rubric-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.rubric-item {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  user-select: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.rubric-item:hover {
+  border-color: var(--accent-mid);
+}
+
+.rubric-item.active {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.rubric-check {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border);
+  border-radius: 4px;
+  margin-top: 1px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.rubric-item.active .rubric-check {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.rubric-check svg {
+  display: none;
+}
+.rubric-item.active .rubric-check svg {
+  display: block;
+}
+
+.rubric-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.rubric-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fg);
+  line-height: 1.3;
+}
+
+.rubric-weight {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--fg-muted);
+  margin-top: 2px;
+}
+
+.transcript-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.transcript-textarea {
+  flex: 1;
+  min-height: 220px;
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--fg);
+  line-height: 1.65;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.transcript-textarea:focus {
+  border-color: var(--accent);
+}
+
+.transcript-textarea::placeholder {
+  color: var(--fg-faint);
+}
+
+.load-example {
+  font-size: 12px;
+  color: var(--accent);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--font-body);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  align-self: flex-start;
+  transition: opacity 0.15s;
+}
+
+.load-example:hover { opacity: 0.7; }
+
+.analyze-btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: opacity 0.15s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.analyze-btn:hover { opacity: 0.88; }
+.analyze-btn:active { transform: scale(0.99); }
+.analyze-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ─── RESULTS PANEL ─── */
+.panel-results {
+  padding: 28px 28px 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+@media (max-width: 800px) {
+  .panel-results {
+    padding: 20px 16px;
+  }
+}
+
+.results-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 12px;
+  color: var(--fg-faint);
+  text-align: center;
+  padding: 48px 24px;
+}
+
+.empty-icon {
+  width: 48px;
+  height: 48px;
+  opacity: 0.4;
+}
+
+.results-empty p {
+  font-size: 13px;
+  max-width: 220px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* score ring */
+.score-block {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 22px;
+}
+
+.score-ring-wrap {
+  flex-shrink: 0;
+  position: relative;
+  width: 72px;
+  height: 72px;
+}
+
+.score-ring-wrap svg {
+  transform: rotate(-90deg);
+}
+
+.score-ring-value {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--fg);
+}
+
+.score-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.score-verdict {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--fg);
+  line-height: 1.15;
+  letter-spacing: -0.3px;
+}
+
+.score-call-id {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-muted);
+  margin-top: 4px;
+}
+
+.score-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin-top: 8px;
+}
+
+.badge-pass { background: var(--pass-light); color: var(--pass); }
+.badge-warn { background: var(--warn-light); color: var(--warn); }
+.badge-fail { background: var(--fail-light); color: var(--fail); }
+
+/* dimension bars */
+.dimensions-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dim-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.dim-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.dim-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fg);
+}
+
+.dim-score {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--fg-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.dim-bar-track {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.dim-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dim-note {
+  font-size: 11.5px;
+  color: var(--fg-muted);
+  line-height: 1.5;
+}
+
+/* flags */
+.flags-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.flag-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border-left: 3px solid transparent;
+  background: var(--bg);
+}
+
+.flag-pass { border-left-color: var(--pass); }
+.flag-warn { border-left-color: var(--warn); }
+.flag-fail { border-left-color: var(--fail); }
+
+.flag-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.flag-text {
+  font-size: 13px;
+  color: var(--fg);
+  line-height: 1.45;
+}
+
+.flag-text strong {
+  font-weight: 600;
+}
+
+/* coaching */
+.coaching-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+
+.coaching-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--fg);
+  margin-bottom: 12px;
+}
+
+.coaching-item {
+  font-size: 13px;
+  color: var(--fg-muted);
+  line-height: 1.55;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.coaching-item:last-child { border-bottom: none; }
+
+.coaching-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-faint);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* footnote */
+.footnote {
+  margin-top: auto;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--fg-faint);
+  line-height: 1.6;
+  font-style: italic;
+}
+
+.footnote a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* spinner */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation: none; }
+  .dim-bar-fill { transition: none; }
+}
+</style>
+
+<header class="site-header">
+  <div class="header-brand">
+    <span class="brand-name">Call QA Analyzer</span>
+    <span class="brand-tag">v0.1 · Prototype</span>
+  </div>
+  <span class="header-meta">Human Performance Analytics / Keila Muñoz</span>
+</header>
+
+<main class="app-shell">
+
+  <!-- INPUT PANEL -->
+  <section class="panel-input">
+    <div>
+      <div class="section-label">Input</div>
+      <h1 class="panel-title">QA Scoring Engine</h1>
+      <p class="panel-subtitle">Paste a call transcript or summary. Select the dimensions to score. Run the analysis.</p>
+    </div>
+
+    <div>
+      <div class="section-label">Scoring Rubric — select dimensions</div>
+      <div class="rubric-grid" id="rubricGrid">
+        <!-- injected by JS -->
+      </div>
+    </div>
+
+    <div class="transcript-area">
+      <div class="section-label">Transcript / Summary</div>
+      <textarea
+        class="transcript-textarea"
+        id="transcriptInput"
+        placeholder="Paste call transcript here…
+
+Example:
+Agent: Thank you for calling, this is Alex. How can I help?
+Customer: I've been waiting 3 weeks for my equipment and still nothing.
+Agent: I'm sorry about that. Let me pull up your account…"
+        rows="10"
+      ></textarea>
+      <button class="load-example" id="loadExampleBtn" type="button">Load example call →</button>
+    </div>
+
+    <button class="analyze-btn" id="analyzeBtn" type="button">
+      <span id="btnLabel">Run QA Analysis</span>
+    </button>
+  </section>
+
+  <!-- RESULTS PANEL -->
+  <section class="panel-results" id="resultsPanel">
+    <div class="results-empty" id="emptyState">
+      <svg class="empty-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="8" y="6" width="32" height="38" rx="3"/>
+        <line x1="16" y1="16" x2="32" y2="16"/>
+        <line x1="16" y1="23" x2="32" y2="23"/>
+        <line x1="16" y1="30" x2="26" y2="30"/>
+        <circle cx="36" cy="36" r="8" fill="var(--bg)" stroke="currentColor"/>
+        <polyline points="32,36 35,39 40,33" stroke-width="1.5"/>
+      </svg>
+      <p>Paste a transcript and run the analysis to see the QA report here.</p>
+    </div>
+
+    <div id="resultsContent" hidden>
+      <!-- Score block -->
+      <div class="score-block" id="scoreBlock">
+        <div class="score-ring-wrap">
+          <svg width="72" height="72" viewBox="0 0 72 72">
+            <circle cx="36" cy="36" r="30" fill="none" stroke="var(--border)" stroke-width="6"/>
+            <circle cx="36" cy="36" r="30" fill="none" stroke="var(--accent)" stroke-width="6"
+              stroke-linecap="round"
+              id="scoreArc"
+              stroke-dasharray="188.5"
+              stroke-dashoffset="188.5"/>
+          </svg>
+          <div class="score-ring-value" id="scoreNum">—</div>
+        </div>
+        <div class="score-meta">
+          <div class="score-verdict" id="scoreVerdict">—</div>
+          <div class="score-call-id" id="callId">Call ID: —</div>
+          <div id="scoreBadge" class="score-badge">—</div>
+        </div>
+      </div>
+
+      <!-- Dimension bars -->
+      <div>
+        <div class="section-label">Dimension Scores</div>
+        <div class="dimensions-block" id="dimensionsBlock"></div>
+      </div>
+
+      <!-- Flags -->
+      <div>
+        <div class="section-label">Findings</div>
+        <div class="flags-block" id="flagsBlock"></div>
+      </div>
+
+      <!-- Coaching -->
+      <div class="coaching-block" id="coachingBlock">
+        <div class="coaching-title">Coaching Priorities</div>
+        <div id="coachingList"></div>
+      </div>
+    </div>
+
+    <div class="footnote">
+      * Built without writing a single line of code manually — designed with AI using critical thinking, governance frameworks, and a clear analytical brief. The tool exists because I knew what questions to ask.
+      <a href="https://keilamunoz.medium.com/ai-absorbs-the-volume-nobody-absorbs-the-human-6c0a5e64788c" target="_blank">Read the article →</a>
+    </div>
+  </section>
+
+</main>
+
+<script>
+// ─── RUBRIC DIMENSIONS ───────────────────────────────────────────
+const DIMENSIONS = [
+  { id: 'greeting',      name: 'Opening & Verification',  weight: 15, active: true },
+  { id: 'empathy',       name: 'Empathy & Tone',           weight: 20, active: true },
+  { id: 'resolution',    name: 'Issue Resolution',         weight: 25, active: true },
+  { id: 'compliance',    name: 'Compliance & Disclosures', weight: 20, active: true },
+  { id: 'closing',       name: 'Call Closing',             weight: 10, active: true },
+  { id: 'efficiency',    name: 'Handle Time / Efficiency', weight: 10, active: false },
+];
+
+// ─── EXAMPLE TRANSCRIPT ──────────────────────────────────────────
+const EXAMPLE = `Agent: Thank you for calling, this is Jordan. May I have your account number?
+Customer: It's 4872-991. I've been calling for three weeks about my equipment.
+Agent: I see your account. What's the issue?
+Customer: My router was supposed to arrive on the 3rd. It's the 24th and nothing. I work from home, Jordan. I need this.
+Agent: I understand. Let me check the order. [pause] Okay, there was a shipping error. It was returned to the warehouse.
+Customer: Are you serious? Nobody called me. Nobody emailed me. Nothing.
+Agent: I apologize for that. I can reship it today with expedited delivery, so you'll have it in two business days.
+Customer: And what about the service I've been paying for without having the equipment?
+Agent: I'm going to credit your account for 21 days of service. That's $34.62 back on your next bill.
+Customer: Okay. I appreciate that. When exactly will the router arrive?
+Agent: By Wednesday the 26th before 8pm. You'll get a tracking email within the hour. Is there anything else I can help you with?
+Customer: No. Thank you.
+Agent: Thank you for your patience and for being a valued customer. Have a good day.`;
+
+// ─── BUILD RUBRIC UI ─────────────────────────────────────────────
+function buildRubric() {
+  const grid = document.getElementById('rubricGrid');
+  grid.innerHTML = DIMENSIONS.map(d => `
+    <div class="rubric-item ${d.active ? 'active' : ''}" data-id="${d.id}" role="checkbox" aria-checked="${d.active}" tabindex="0">
+      <div class="rubric-check">
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+          <polyline points="2,5 4.5,7.5 8,3" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="rubric-text">
+        <div class="rubric-name">${d.name}</div>
+        <div class="rubric-weight">${d.weight} pts</div>
+      </div>
+    </div>
+  `).join('');
+
+  grid.querySelectorAll('.rubric-item').forEach(el => {
+    const toggle = () => {
+      const id = el.dataset.id;
+      const dim = DIMENSIONS.find(d => d.id === id);
+      dim.active = !dim.active;
+      el.classList.toggle('active', dim.active);
+      el.setAttribute('aria-checked', dim.active);
+    };
+    el.addEventListener('click', toggle);
+    el.addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(); } });
+  });
+}
+
+// ─── QA ANALYSIS ENGINE (rule-based) ─────────────────────────────
+function analyzeTranscript(text, activeDimensions) {
+  const t = text.toLowerCase();
+  const lines = text.split('\n').filter(l => l.trim());
+  const agentLines = lines.filter(l => l.match(/^agent:/i));
+  const agentText = agentLines.map(l => l.replace(/^agent:\s*/i, '')).join(' ').toLowerCase();
+
+  const scores = {};
+  const flags = [];
+  const coaching = [];
+
+  // GREETING & VERIFICATION
+  if (activeDimensions.includes('greeting')) {
+    let s = 0;
+    if (/thank you for calling/i.test(text)) { s += 5; }
+    if (/account number|your account|may i have|can i get/i.test(agentText)) { s += 6; flags.push({ type: 'pass', text: '<strong>Verification:</strong> Agent requested account number.' }); }
+    else { flags.push({ type: 'warn', text: '<strong>Verification:</strong> No clear account verification detected.' }); coaching.push('Always verify account before accessing customer data.'); }
+    if (/this is \w+/i.test(agentText)) s += 4;
+    scores['greeting'] = Math.min(s, 15);
+  }
+
+  // EMPATHY & TONE
+  if (activeDimensions.includes('empathy')) {
+    let s = 8;
+    const empathyWords = ['understand', 'apologize', 'i\'m sorry', 'i see', 'appreciate', 'patience'];
+    const found = empathyWords.filter(w => agentText.includes(w));
+    s += Math.min(found.length * 3, 9);
+    if (found.length >= 2) {
+      flags.push({ type: 'pass', text: `<strong>Empathy signals:</strong> "${found.slice(0,2).join('", "')}" — agent acknowledged customer frustration.` });
+    } else {
+      flags.push({ type: 'warn', text: '<strong>Empathy signals:</strong> Minimal empathy language detected. Customer expressed frustration.' });
+      coaching.push('Mirror customer frustration with explicit empathy before moving to solutions.');
+    }
+    if (/valued customer/i.test(agentText)) s += 2;
+    scores['empathy'] = Math.min(s, 20);
+  }
+
+  // ISSUE RESOLUTION
+  if (activeDimensions.includes('resolution')) {
+    let s = 0;
+    if (/reship|resend|send.*today|order.*today/i.test(agentText)) { s += 10; flags.push({ type: 'pass', text: '<strong>Resolution:</strong> Agent offered concrete solution (reship with expedited delivery).' }); }
+    if (/credit|refund|\$\d+/i.test(agentText)) { s += 10; flags.push({ type: 'pass', text: '<strong>Proactive recovery:</strong> Agent offered bill credit without customer demanding it.' }); }
+    else if (/credit|refund/i.test(t)) { s += 5; }
+    if (/tracking|email|confirm/i.test(agentText)) s += 5;
+    scores['resolution'] = Math.min(s, 25);
+  }
+
+  // COMPLIANCE
+  if (activeDimensions.includes('compliance')) {
+    let s = 10;
+    if (/tracking|email within/i.test(agentText)) { s += 6; flags.push({ type: 'pass', text: '<strong>Follow-through:</strong> Agent confirmed written confirmation (tracking email).' }); }
+    if (/anything else|anything i can/i.test(agentText)) { s += 4; }
+    else { flags.push({ type: 'warn', text: '<strong>Wrap-up:</strong> No explicit "anything else I can help with" close detected.' }); coaching.push('Always use a formal soft close before ending: "Is there anything else I can help you with today?"'); }
+    scores['compliance'] = Math.min(s, 20);
+  }
+
+  // CLOSING
+  if (activeDimensions.includes('closing')) {
+    let s = 0;
+    if (/have a good|have a great|good day|good night/i.test(agentText)) s += 5;
+    if (/thank you for.*patient|thank you for your/i.test(agentText)) s += 5;
+    scores['closing'] = Math.min(s, 10);
+    if (s >= 8) flags.push({ type: 'pass', text: '<strong>Closing:</strong> Professional call wrap-up detected.' });
+    else { flags.push({ type: 'warn', text: '<strong>Closing:</strong> Weak or missing closing.' }); coaching.push('End every call with a sincere appreciation statement and a warm farewell.'); }
+  }
+
+  // EFFICIENCY (optional)
+  if (activeDimensions.includes('efficiency')) {
+    const wordCount = agentText.split(/\s+/).length;
+    let s = 10;
+    if (wordCount > 200) { s = 6; flags.push({ type: 'warn', text: '<strong>Efficiency:</strong> High agent word count may indicate unnecessary elaboration.' }); }
+    else { flags.push({ type: 'pass', text: '<strong>Efficiency:</strong> Agent word count within expected range.' }); }
+    scores['efficiency'] = s;
+  }
+
+  // TOTAL
+  const activeTotal = activeDimensions.reduce((sum, id) => {
+    const d = DIMENSIONS.find(d => d.id === id);
+    return sum + (d ? d.weight : 0);
+  }, 0);
+
+  const rawScore = Object.values(scores).reduce((a, b) => a + b, 0);
+  const pct = activeTotal > 0 ? Math.round((rawScore / activeTotal) * 100) : 0;
+
+  return { scores, flags, coaching, pct, rawScore, activeTotal };
+}
+
+// ─── RENDER RESULTS ───────────────────────────────────────────────
+function renderResults(result, activeDimensions) {
+  const { scores, flags, coaching, pct } = result;
+
+  // score ring
+  const arc = 188.5;
+  const offset = arc - (arc * pct / 100);
+  document.getElementById('scoreArc').style.strokeDashoffset = offset;
+  document.getElementById('scoreNum').textContent = pct;
+
+  let verdict, badgeClass, badgeText;
+  if (pct >= 85) { verdict = 'Excellent Call'; badgeClass = 'badge-pass'; badgeText = 'PASS — Above Standard'; }
+  else if (pct >= 70) { verdict = 'Meets Standard'; badgeClass = 'badge-warn'; badgeText = 'CONDITIONAL — Review Flagged Items'; }
+  else { verdict = 'Below Standard'; badgeClass = 'badge-fail'; badgeText = 'FAIL — Coaching Required'; }
+
+  document.getElementById('scoreVerdict').textContent = verdict;
+  const badge = document.getElementById('scoreBadge');
+  badge.textContent = badgeText;
+  badge.className = 'score-badge ' + badgeClass;
+  document.getElementById('callId').textContent = 'Call ID: QA-' + Math.random().toString(36).slice(2, 8).toUpperCase() + ' · ' + new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+  // dimensions
+  const dimBlock = document.getElementById('dimensionsBlock');
+  dimBlock.innerHTML = activeDimensions.map(id => {
+    const dim = DIMENSIONS.find(d => d.id === id);
+    if (!dim) return '';
+    const score = scores[id] ?? 0;
+    const pctDim = Math.round((score / dim.weight) * 100);
+    const color = pctDim >= 80 ? 'var(--pass)' : pctDim >= 60 ? 'var(--warn)' : 'var(--fail)';
+    return `
+      <div class="dim-row">
+        <div class="dim-header">
+          <span class="dim-name">${dim.name}</span>
+          <span class="dim-score">${score} / ${dim.weight}</span>
+        </div>
+        <div class="dim-bar-track">
+          <div class="dim-bar-fill" style="width:${pctDim}%; background:${color};"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // animate bars
+  setTimeout(() => {
+    dimBlock.querySelectorAll('.dim-bar-fill').forEach(el => {
+      const w = el.style.width;
+      el.style.width = '0%';
+      requestAnimationFrame(() => { el.style.width = w; });
+    });
+  }, 50);
+
+  // flags
+  const flagIcons = { pass: '✓', warn: '△', fail: '✕' };
+  document.getElementById('flagsBlock').innerHTML = flags.map(f => `
+    <div class="flag-item flag-${f.type}">
+      <span class="flag-icon">${flagIcons[f.type]}</span>
+      <span class="flag-text">${f.text}</span>
+    </div>
+  `).join('');
+
+  // coaching
+  const list = document.getElementById('coachingList');
+  if (coaching.length === 0) {
+    list.innerHTML = '<div class="coaching-item"><span class="coaching-num">—</span><span>No critical coaching items. Review flagged observations above for quality refinement.</span></div>';
+  } else {
+    list.innerHTML = coaching.map((c, i) => `
+      <div class="coaching-item">
+        <span class="coaching-num">0${i + 1}</span>
+        <span>${c}</span>
+      </div>
+    `).join('');
+  }
+
+  // show
+  document.getElementById('emptyState').hidden = true;
+  document.getElementById('resultsContent').hidden = false;
+}
+
+// ─── EVENTS ──────────────────────────────────────────────────────
+buildRubric();
+
+document.getElementById('loadExampleBtn').addEventListener('click', () => {
+  document.getElementById('transcriptInput').value = EXAMPLE;
+});
+
+document.getElementById('analyzeBtn').addEventListener('click', () => {
+  const text = document.getElementById('transcriptInput').value.trim();
+  if (!text) {
+    document.getElementById('transcriptInput').focus();
+    return;
+  }
+
+  const activeDimensions = DIMENSIONS.filter(d => d.active).map(d => d.id);
+  if (activeDimensions.length === 0) return;
+
+  // fake async for UX
+  const btn = document.getElementById('analyzeBtn');
+  const label = document.getElementById('btnLabel');
+  btn.disabled = true;
+  label.textContent = 'Analyzing…';
+  const spinner = document.createElement('div');
+  spinner.className = 'spinner';
+  btn.appendChild(spinner);
+
+  setTimeout(() => {
+    const result = analyzeTranscript(text, activeDimensions);
+    renderResults(result, activeDimensions);
+    btn.disabled = false;
+    label.textContent = 'Run QA Analysis';
+    spinner.remove();
+    document.getElementById('resultsContent').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 900);
+});
+</script>
+
+</body></html>

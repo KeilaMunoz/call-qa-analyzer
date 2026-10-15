@@ -1,0 +1,18 @@
+CALL B — Agent with Gaps / Frustrated Customer
+(Telecom — Billing Dispute)
+
+Agent: Spectrum, how can I help?
+Customer: I need to talk to someone about my bill. It went up $40 this month and nobody told me.
+Agent: Okay what's your account number.
+Customer: 3390-447. And I want to know why it went up. I've been a customer for six years.
+Agent: It looks like your promotional rate expired. That happens after 12 months.
+Customer: Nobody told me it was going to expire. I would have called sooner.
+Agent: It's in the terms and conditions when you sign up.
+Customer: So what can you do about it?
+Agent: I can look into discounts available on your account. There's a loyalty offer for $15 off for 6 months.
+Customer: That's it? I went from paying $65 to $105. $15 off doesn't fix that.
+Agent: That's the best discount I have available right now.
+Customer: Fine. Whatever.
+Agent: Okay is there anything else?
+Customer: No.
+Agent: Alright bye.

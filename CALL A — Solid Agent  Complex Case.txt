@@ -1,0 +1,16 @@
+CALL A — Solid Agent / Complex Case
+(Telecom — Equipment Delivery Failure)
+
+Agent: Thank you for calling, this is Jordan. May I have your account number?
+Customer: It's 4872-991. I've been calling for three weeks about my equipment.
+Agent: I see your account. What's the issue?
+Customer: My router was supposed to arrive on the 3rd. It's the 24th and nothing. I work from home, Jordan. I need this.
+Agent: I understand. Let me check the order. [pause] Okay, there was a shipping error. It was returned to the warehouse.
+Customer: Are you serious? Nobody called me. Nobody emailed me. Nothing.
+Agent: I apologize for that. I can reship it today with expedited delivery, so you'll have it in two business days.
+Customer: And what about the service I've been paying for without having the equipment?
+Agent: I'm going to credit your account for 21 days of service. That's $34.62 back on your next bill.
+Customer: That's really helpful. Thank you Devon.
+Agent: Of course. Is there anything else I can help you with today?
+Customer: No, that's everything.
+Agent: Thank you for being a valued customer. Have a great day.
